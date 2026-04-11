@@ -45,10 +45,11 @@ public static class DropRateTracker
         //   AND many flying enemies were killed at the same time
         // - The drop rate of those enemies will be calculated _before_ the "dropletHitGround" event fires, because the droplet takes time to fall to the ground.
         // - This can cause bad luck protection to trigger multiple item drops at once
-        if (createPickupInfo.pickupIndex.pickupDef is not null)
+        UniquePickup pickup = (UniquePickup)createPickupInfo._pickupState;
+        if (pickup.pickupIndex.pickupDef is not null)
         {
-            var def = createPickupInfo.pickupIndex.pickupDef;
-            bool isItem = def.coinValue == 0 && def.nameToken != "PICKUP_LUNAR_COIN";
+            var def = pickup.pickupIndex.pickupDef;
+            bool isItem = def.coinValue == 0 && def.nameToken != "PICKUP_LUNAR_COIN" && createPickupInfo.pickup.isTempItem;
             if (isItem)
             {
                 cumulativeDropChance = 0;

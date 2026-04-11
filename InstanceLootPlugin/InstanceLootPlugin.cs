@@ -171,7 +171,7 @@ namespace InstanceLootPlugin
                         obj.gameObject.transform.position = newPos;
                     }
                 }
-                catch (NullReferenceException e)
+                catch (NullReferenceException)
                 {
                     Logger.LogDebug("Failed to pull CommandCubes with F3 - most likely because there were none.");
                 }
@@ -279,7 +279,7 @@ namespace InstanceLootPlugin
             On.RoR2.Networking.NetworkMessageHandlerAttribute.RegisterClientMessages += NetworkMessageHandlerAttribute_RegisterClientMessages;
 
             // Hooks pickup creation to control drop on client
-            On.RoR2.PickupDropletController.CreateCommandCube += PickupDropletController_CreateCommandCube; ;
+            On.RoR2.PickupDropletController.CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 += PickupDropletController_CreateCommandCube;
 
             // Hook interaction since we didn't generate a real network object
             On.RoR2.Interactor.AttemptInteraction += Interactor_AttemptInteraction;
@@ -293,13 +293,14 @@ namespace InstanceLootPlugin
             IsModHooked = true;
         }
 
+
         private void UnHook()
         {
             Logger.LogInfo("Unloading hooks");
 
             On.RoR2.Util.GetExpAdjustedDropChancePercent -= Util_GetExpAdjustedDropChancePercent;
             On.RoR2.Networking.NetworkMessageHandlerAttribute.RegisterClientMessages -= NetworkMessageHandlerAttribute_RegisterClientMessages;
-            On.RoR2.PickupDropletController.CreateCommandCube -= PickupDropletController_CreateCommandCube;
+            On.RoR2.PickupDropletController.CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 -= PickupDropletController_CreateCommandCube;
             On.RoR2.Interactor.AttemptInteraction -= Interactor_AttemptInteraction;
             On.RoR2.PickupPickerController.SubmitChoice -= PickupPickerController_SubmitChoice;
             On.RoR2.GenericPickupController.CreatePickup -= GenericPickupController_CreatePickup;
@@ -325,16 +326,15 @@ namespace InstanceLootPlugin
                 return;
             }
 
-            PickupPickerController.PickupIndexUnityEvent pickupIndexUnityEvent = self.onPickupSelected;
-            if (pickupIndexUnityEvent == null)
+            PickupPickerController.UniquePickupUnityEvent uniquePickupUnityEvent = self.onUniquePickupSelected;
+            if (uniquePickupUnityEvent == null)
             {
                 return;
             }
+            uniquePickupUnityEvent.Invoke(ptr.pickup); // This spawns an instance of the item when client==server
+            Log.Info($"Sending CreatePickup {self.options[choiceIndex].pickup.pickupIndex}");
 
-            pickupIndexUnityEvent.Invoke(ptr.pickupIndex.value); // This spawns an instance of the item when client==server
-            Log.Info($"Sending CreatePickup {self.options[choiceIndex].pickupIndex}");
-
-            new SpawnCustomMessage2(self.options[choiceIndex].pickupIndex, ((MPEventSystem)EventSystem.current).localUser.cachedMaster.GetBodyObject().transform.position)
+            new SpawnCustomMessage2(self.options[choiceIndex].pickup.pickupIndex, ((MPEventSystem)EventSystem.current).localUser.cachedMaster.GetBodyObject().transform.position)
                 .Send(R2API.Networking.NetworkDestination.Server);
 
             self.OnDisplayEnd(null, null, null);
@@ -353,11 +353,12 @@ namespace InstanceLootPlugin
             }
         }
 
-        private void PickupDropletController_CreateCommandCube(On.RoR2.PickupDropletController.orig_CreateCommandCube orig, PickupDropletController self)
-        {
-            DropRateTracker.RegisterItemDrop(self.createPickupInfo);
 
-            NetworkServer.SendToAll(969, new SpawnCustomMessage() { position = self.createPickupInfo.position, pickupIndex = self.createPickupInfo.pickupIndex });
+
+        private void PickupDropletController_CreateCommandCube(On.RoR2.PickupDropletController.orig_CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 orig, CreatePickupInfo pickupInfo, Vector3 position, Vector3 velocity)
+        {
+            DropRateTracker.RegisterItemDrop(pickupInfo);
+            NetworkServer.SendToAll(969, new SpawnCustomMessage() { position = pickupInfo.position, pickupIndex = pickupInfo.pickup.pickupIndex });
         }
 
         /// <summary>

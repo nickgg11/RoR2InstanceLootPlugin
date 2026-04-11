@@ -29,24 +29,24 @@ namespace InstanceLootPlugin
             var pickupInfo = new GenericPickupController.CreatePickupInfo
             {
                 rotation = Quaternion.identity,
-                pickupIndex = pickupIndex
+                _pickupState = new UniquePickup(pickupIndex)
             };
       
             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(CommandArtifactManager.commandCubePrefab, position, pickupInfo.rotation);
             var pickupIndexNetworker = gameObject.GetComponent<PickupIndexNetworker>();
             var picker = gameObject.GetComponent<PickupPickerController>();
 
-            picker.SetOptionsInternal(PickupPickerController.GetOptionsFromPickupIndex(pickupInfo.pickupIndex));
+            picker.SetOptionsInternal(PickupPickerController.GetOptionsFromPickupState((UniquePickup)pickupInfo._pickupState));
 
             if (!NetworkServer.active)
             {
                 picker.SetDirtyBit(PickupPickerController.optionsDirtyBit);
             }
 
-            pickupIndexNetworker.NetworkpickupIndex = pickupInfo.pickupIndex;
+            pickupIndexNetworker.NetworkpickupState = (UniquePickup)pickupInfo._pickupState;
             if (pickupIndexNetworker.pickupDisplay)
             {
-                pickupIndexNetworker.pickupDisplay.SetPickupIndex(pickupInfo.pickupIndex, false);
+                pickupIndexNetworker.pickupDisplay.SetPickup((UniquePickup)pickupInfo._pickupState, false);
             }
         }
 
@@ -66,7 +66,7 @@ namespace InstanceLootPlugin
             {
                 rotation = Quaternion.identity,
                 position = position,
-                pickupIndex = pickupIndex,
+                _pickupState = new UniquePickup(pickupIndex),
             };
 
             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(pickupInfo.prefabOverride ?? GenericPickupController.pickupPrefab, position, pickupInfo.rotation);
@@ -75,14 +75,14 @@ namespace InstanceLootPlugin
             {
                 GenericPickupController genericPickupController = component;
                 GenericPickupController.CreatePickupInfo createPickupInfo2 = pickupInfo;
-                genericPickupController.NetworkpickupIndex = createPickupInfo2.pickupIndex;
+                genericPickupController.Network_pickupState = (UniquePickup)createPickupInfo2._pickupState;
             }
             PickupIndexNetworker component2 = gameObject.GetComponent<PickupIndexNetworker>();
             if (component2)
             {
                 PickupIndexNetworker pickupIndexNetworker = component2;
                 GenericPickupController.CreatePickupInfo createPickupInfo2 = pickupInfo;
-                pickupIndexNetworker.NetworkpickupIndex = createPickupInfo2.pickupIndex;
+                pickupIndexNetworker.NetworkpickupState = (UniquePickup)createPickupInfo2._pickupState;
             }
             PickupPickerController component3 = gameObject.GetComponent<PickupPickerController>();
             if (component3 && pickupInfo.pickerOptions != null)
