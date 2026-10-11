@@ -37,19 +37,15 @@ public static class DropRateTracker
         }
     }
 
-    public static void RegisterItemDrop(GenericPickupController.CreatePickupInfo createPickupInfo)
+    /// <summary>
+    /// Called when a monster kill creates a droplet, so bad luck protection sees the drop before the next kill is rolled.
+    /// </summary>
+    public static void RegisterItemDrop(UniquePickup pickup)
     {
-        // It is worth noting that there is a bug with this logic
-        // - If cumulativeDropChance > 100
-        //   AND players are falling behind on loot
-        //   AND many flying enemies were killed at the same time
-        // - The drop rate of those enemies will be calculated _before_ the "dropletHitGround" event fires, because the droplet takes time to fall to the ground.
-        // - This can cause bad luck protection to trigger multiple item drops at once
-        UniquePickup pickup = (UniquePickup)createPickupInfo._pickupState;
-        if (pickup.pickupIndex.pickupDef is not null)
+        var def = pickup.pickupIndex.pickupDef;
+        if (def is not null)
         {
-            var def = pickup.pickupIndex.pickupDef;
-            bool isItem = def.coinValue == 0 && def.nameToken != "PICKUP_LUNAR_COIN" && createPickupInfo.pickup.isTempItem;
+            bool isItem = def.coinValue == 0 && def.nameToken != "PICKUP_LUNAR_COIN";
             if (isItem)
             {
                 cumulativeDropChance = 0;
