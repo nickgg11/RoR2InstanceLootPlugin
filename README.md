@@ -4,7 +4,7 @@ This plugin is used to provide instance based loot when you're running with "Art
 
 ## AI Disclosure
 
-The 2.3.0 update (the RoR2 1.5 update, the new features and bug fixes listed in its changelog, and this README) was written with help from AI. The maintainer read and reviewed all of the AI-written changes. Versions before 2.3.0 contain no AI-generated code.
+The 2.3.0 and 2.4.0 updates (the RoR2 1.5 update, the new features and bug fixes listed in the changelog, and this README) were written with help from AI. The maintainer read and reviewed all of the AI-written changes. Versions before 2.3.0 contain no AI-generated code.
 
 ## Features
 
@@ -25,10 +25,11 @@ The 2.3.0 update (the RoR2 1.5 update, the new features and bug fixes listed in 
 - Adds a console command `drop_rate <value>` to set a custom drop rate for items (0-100).
 - Adds a console command `drop_rate_report` to view drop rate statistics for your run in the debugging window.
 - Adds a console command `instance_loot_hotkey <key>` to change the pull hotkey (for example `instance_loot_hotkey F4`).
+- If [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) is installed, the pull hotkey can also be rebound from the in-game mod options menu.
 
 ## Configuration
 
-The config file is `BepInEx/config/programit.InstanceBasedLoot.cfg`. It is created the first time you launch the game with the mod installed. Edit it while the game is closed, then launch the game.
+The config file is `BepInEx/config/programit.InstanceBasedLoot.cfg`. It is created the first time you launch the game with the mod installed. Edit it while the game is closed, then launch the game. With [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) installed, `PullItemsHotkey` can also be changed in game from the mod options menu.
 
 Instancing is decided by the host, so only the host's config matters for these settings.
 
@@ -65,7 +66,7 @@ Turning off `MonsterDrops` doesn't turn off the drop rate changes below. If mons
 | `MinimumDropChance` | `1` | The lowest drop chance player scaling can go down to. |
 | `EnableSwarmsScaling` | `true` | Lowers drop chances with Artifact of Swarms to account for the doubled spawns. |
 | `EnableBadLuckProtection` | `true` | Raises drop chances during long stretches without drops. |
-| `PullItemsHotkey` | `F3` | Hotkey that pulls your cubes to you. This one is per player. |
+| `PullItemsHotkey` | `F3` | Hotkey that pulls your cubes to you. This one is per player. Modifiers can be added, like `F3 + LeftControl`. |
 
 ## How is this different from InstancedLoot Continuation?
 
@@ -76,7 +77,7 @@ This mod is narrower and built for one setup: **Artifact of Sacrifice + Artifact
 - It only does something when Artifact of Command is enabled. Nothing is instanced in a normal run.
 - It instances the Command cubes that drop from monster kills, teleporter/boss rewards, chests and event rewards, not the chests or shrines themselves. Everyone opens the same chest, and each player gets their own cube from it.
 - It rebalances Sacrifice drop rates for shared loot: it scales the drop chance by player count, compensates for Artifact of Swarms, and adds bad luck protection so low drop rates don't leave you without items for long stretches.
-- It adds a hotkey to pull your unclaimed cubes to you, and console commands to set and report drop rates.
+- It adds a hotkey to pull your unclaimed cubes to you (rebindable in game with Risk Of Options), and console commands to set and report drop rates.
 - Its config is a simple on/off switch per drop source, not a choice between several instancing modes for each object.
 
 If you want instanced loot in regular runs, or more instancing modes (owner-only pickups, instanced shrines, etc.), use InstancedLoot Continuation. If you play Sacrifice + Command with friends and want balanced, private item choices, use this one. The two mods aren't meant to be installed together.

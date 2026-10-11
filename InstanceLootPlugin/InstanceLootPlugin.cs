@@ -35,6 +35,7 @@ namespace InstanceLootPlugin
     /// 2) A console command `drop_rate <value>` which you can use to set the drop rate of items from monsters
     /// </summary>
     [BepInDependency(NetworkingAPI.PluginGUID)]
+    [BepInDependency(RiskOfOptionsCompat.PluginGUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class InstanceLootPlugin : BaseUnityPlugin
     {
@@ -43,14 +44,14 @@ namespace InstanceLootPlugin
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "programit";
         public const string PluginName = "InstanceBasedLoot";
-        public const string PluginVersion = "2.3.0";
+        public const string PluginVersion = "2.4.0";
         private static ConfigEntry<float> DropChanceMultiplier { get; set; }
         private static ConfigEntry<float> MinimumDropChance { get; set; }
         private static ConfigEntry<float> BaseDropChance { get; set; }
         private static ConfigEntry<bool> EnablePlayerDropRateScaling { get; set; }
         private static ConfigEntry<bool> EnableSwarmsScaling { get; set; }
         private static ConfigEntry<bool> EnableBadLuckProtection { get; set; }
-        private static ConfigEntry<KeyCode> PullItemsHotKey { get; set; }
+        private static ConfigEntry<KeyboardShortcut> PullItemsHotKey { get; set; }
 
         // Matches current default drop rate. Differs from BaseDropChance because we override it for player scaling.
         public static float dropChance = 5;
@@ -144,11 +145,11 @@ namespace InstanceLootPlugin
                 "Enabling this will increase drop rate consistency with low drop rates."
             );
 
-            PullItemsHotKey = base.Config.Bind<KeyCode>(
+            PullItemsHotKey = base.Config.Bind<KeyboardShortcut>(
                 "General",
                 "PullItemsHotkey",
-                KeyCode.F3,
-                "Hotkey to use to pull items to yourself."
+                new KeyboardShortcut(KeyCode.F3),
+                "Hotkey to use to pull items to yourself. Modifiers can be added, e.g. `F3 + LeftControl`."
             );
 
             BaseDropChance = base.Config.Bind<float>(
@@ -159,6 +160,11 @@ namespace InstanceLootPlugin
             );
 
             InstancingConfig.Bind(base.Config);
+
+            if (RiskOfOptionsCompat.Enabled)
+            {
+                RiskOfOptionsCompat.AddPullItemsHotkey(PullItemsHotKey);
+            }
 
             dropRateManager = new DropRateManager(
                 EnableBadLuckProtection,
@@ -260,7 +266,7 @@ namespace InstanceLootPlugin
         private void Update()
         {
             // Pulls all of your CommandCubes to you.
-            if (!Input.GetKeyDown(PullItemsHotKey.Value))
+            if (!IsHotkeyPressed(PullItemsHotKey.Value))
             {
                 return;
             }
@@ -817,13 +823,22 @@ namespace InstanceLootPlugin
 
             if (Enum.TryParse(key, true, out KeyCode keyCode))
             {
-                PullItemsHotKey.Value = keyCode;
+                PullItemsHotKey.Value = new KeyboardShortcut(keyCode);
                 Log.Info($"Pull items hotkey set to {keyCode}");
             }
             else
             {
                 Log.Warning($"Failed to set hotkey to {key}");
             }
+        }
+
+        // KeyboardShortcut.IsDown() fails when other keys are held, which would block the hotkey while moving or
+        // sprinting. Only require the main key and the shortcut's own modifiers.
+        private static bool IsHotkeyPressed(KeyboardShortcut shortcut)
+        {
+            return shortcut.MainKey != KeyCode.None
+                && Input.GetKeyDown(shortcut.MainKey)
+                && shortcut.Modifiers.All(Input.GetKey);
         }
 
         private static LocalUser GetLocalUser(Interactor interactor)

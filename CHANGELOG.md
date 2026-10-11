@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0
+
+- Add optional [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) support. The pull hotkey can now be rebound in game from the mod options menu.
+- The pull hotkey now supports modifier keys, like `F3 + LeftControl`.
+- Holding other keys (moving, sprinting) no longer blocks the pull hotkey.
+
 ## 2.3.0
 
 - Update for Risk of Rain 2 1.5 and update all libraries.
