@@ -2,74 +2,91 @@
 
 This plugin is used to provide instance based loot when you're running with "Artifact of Sacrifice" and "Artifact of Command" enabled.
 
+## AI Disclosure
+
+The 2.3.0 and 2.4.0 updates (the RoR2 1.5 update, the new features and bug fixes listed in the changelog, and this README) were written with help from AI. The maintainer read and reviewed all of the AI-written changes. Versions before 2.3.0 contain no AI-generated code.
+
 ## Features
 
+- By default, each player gets their own private Command cube for drops from:
+  - monster kills (Artifact of Sacrifice)
+  - teleporter and boss rewards
+  - chests, equipment barrels, lunar pods, adaptive chests and scavenger bags
+  - void cradles, void potentials and void seed rewards
+  - boss items dropped by Trophy Hunter's Tricorn
+  - N'tormat book and page rewards, including N'kuhana chests (each player only sees their own)
+  - rewards the game drops once per player in a pile: Void Fields, Simulacrum waves, Halcyonite shrines, the Aurelionite heart, False Son, geodes and other encounters
+- Rusted Key and Encrusted Key lockboxes give one shared drop by default.
+- Each of these sources can be turned on or off in the config. See [Configuration](#configuration).
+- Everything else is always vanilla: shops, printers, scrappers, cauldrons, the Bazaar, Shrines of Chance and lunar coins.
 - Ensures drop rates are appropriate for the number of players, since all drops are shared now.
 - Adds bad luck protection to prevent long stretches without item drops from kills.
-- Adds a shortcut `F3` to pull all unpicked items to you.
+- Adds a hotkey (`F3` by default) to pull all unpicked Command cubes to you, both your private cubes and shared ones.
 - Adds a console command `drop_rate <value>` to set a custom drop rate for items (0-100).
 - Adds a console command `drop_rate_report` to view drop rate statistics for your run in the debugging window.
-- Adds a console command `instance_loot_hotkey` that can be used to change the default hotkey
+- Adds a console command `instance_loot_hotkey <key>` to change the pull hotkey (for example `instance_loot_hotkey F4`).
+- If [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) is installed, the pull hotkey can also be rebound from the in-game mod options menu.
+
+## Configuration
+
+The config file is `BepInEx/config/programit.InstanceBasedLoot.cfg`. It is created the first time you launch the game with the mod installed. Edit it while the game is closed, then launch the game. With [Risk Of Options](https://thunderstore.io/package/Rune580/Risk_Of_Options/) installed, `PullItemsHotkey` can also be changed in game from the mod options menu.
+
+Instancing is decided by the host, so only the host's config matters for these settings.
+
+### Instancing
+
+Set an option to `true` to give each player their own cube from that source, or `false` for one shared cube like vanilla.
+
+| Option | Default | Drops from |
+| --- | --- | --- |
+| `MonsterDrops` | `true` | Monsters killed with Artifact of Sacrifice |
+| `BossRewards` | `true` | Teleporter bosses, Mithrix, Voidling, Aurelionite and other boss encounters |
+| `Chests` | `true` | Small, large, legendary and category chests |
+| `EquipmentBarrels` | `true` | Equipment barrels |
+| `LunarPods` | `true` | Lunar pods |
+| `VoidCradles` | `true` | Void cradles |
+| `AdaptiveChests` | `true` | Adaptive chests |
+| `ScavengerBags` | `true` | Bags dropped by Scavengers |
+| `VoidPotentials` | `true` | Void potentials |
+| `VoidSeeds` | `true` | Void seed rewards |
+| `Lockboxes` | `false` | Rusted Key and Encrusted Key lockboxes |
+| `TrophyHunterDrops` | `true` | Boss items dropped when Trophy Hunter's Tricorn kills a boss |
+| `BookRewards` | `true` | N'tormat book and page rewards from the altar, compulsion quests, shrines and N'kuhana chests. Each player only sees their own book and page |
+| `EventRewards` | `true` | Rewards the game drops once per player in a pile (Void Fields, Simulacrum waves, Halcyonite shrines, the Aurelionite heart, False Son, geodes and other encounters). Each player gets one |
+
+Turning off `MonsterDrops` doesn't turn off the drop rate changes below. If monster drops are shared, you may want to set `EnablePlayerBasedDropRateScaling` to `false`.
+
+### General
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `BaseDropChance` | `5` | Base item drop chance for monster kills. It is recommended to leave this at the default value. |
+| `DropChanceMultiplier` | `1` | Multiplies the drop chance. Use `0.5` to halve or `2` to double. |
+| `EnablePlayerBasedDropRateScaling` | `true` | Divides the drop chance by the number of players, since every player gets a copy of each drop. |
+| `MinimumDropChance` | `1` | The lowest drop chance player scaling can go down to. |
+| `EnableSwarmsScaling` | `true` | Lowers drop chances with Artifact of Swarms to account for the doubled spawns. |
+| `EnableBadLuckProtection` | `true` | Raises drop chances during long stretches without drops. |
+| `PullItemsHotkey` | `F3` | Hotkey that pulls your cubes to you. This one is per player. Modifiers can be added, like `F3 + LeftControl`. |
+
+## How is this different from InstancedLoot Continuation?
+
+[InstancedLoot Continuation](https://thunderstore.io/c/riskofrain2/p/Team7_RotaryCoded/InstancedLoot_continuation/) is a general-purpose instancing mod. It gives every player their own copy of chests, shrines and other objects, with many configurable modes (instance the object, the items, or both, optionally owner-only), and works with or without artifacts.
+
+This mod is narrower and built for one setup: **Artifact of Sacrifice + Artifact of Command**.
+
+- It only does something when Artifact of Command is enabled. Nothing is instanced in a normal run.
+- It instances the Command cubes that drop from monster kills, teleporter/boss rewards, chests and event rewards, not the chests or shrines themselves. Everyone opens the same chest, and each player gets their own cube from it.
+- It rebalances Sacrifice drop rates for shared loot: it scales the drop chance by player count, compensates for Artifact of Swarms, and adds bad luck protection so low drop rates don't leave you without items for long stretches.
+- It adds a hotkey to pull your unclaimed cubes to you (rebindable in game with Risk Of Options), and console commands to set and report drop rates.
+- Its config is a simple on/off switch per drop source, not a choice between several instancing modes for each object.
+
+If you want instanced loot in regular runs, or more instancing modes (owner-only pickups, instanced shrines, etc.), use InstancedLoot Continuation. If you play Sacrifice + Command with friends and want balanced, private item choices, use this one. The two mods aren't meant to be installed together.
 
 ## Changelog
-### 2.2.0
 
-- Add configurable hotkey management for pulling items to you through a new console command `instance_loot_hotkey`
-- Update packages
+See [CHANGELOG.md](CHANGELOG.md).
 
-### 2.1.0
-
-- Fix compatibility after Devotion update
-
-### 2.0.1
-
-- Fix compatibility with CommandQueue mod
-
-### 2.0.0
-
-#### Fixes
-
-- No longer despawns all item drops if Artifact of Command is disabled.
-- Mod will disable itself during Bulwark's Ambry to avoid a bug causing Artifacts to not be rewarded on successful clears.
-- [DropInMultiplayer] Focusing (alt-tab) the Application will fix loot being non-interactable if a player joins after a level has loaded. This issue will resolve automatically at the beginning of the next stage if no action is taken.
-- Resolve NRE log spam from F3 keybind when no items can be pulled.
-
-#### Configuration Options
-
-- Base drop rate
-- Disable player-based drop rates
-- Disable swarm drop rate modifier
-- Minimum drop rate
-- Drop rate mulitplier
-
-#### Dynamic Drop Rates
-
-There are a lot of details here, so it can be hard to understand how the game actually _feels_ with these changes.
-
-Here is what we aimed for:
-
-- Roughly 1 item per minute (this inevitably speeds up later in the game).
-- More consistent experiences with varying group sizes. (Roughly the same item rate as solo play.)
-- More consistent experiences with and without Artifact of Swarms.
-
-**Balance Changes**
-
-1. Compensate drop rate for Artifact of Swarms (the game doubles spawns, but reduces drop rates by as little as 15%).
-2. Ensures drop rates are appropriate for the number of players, since all drops are shared now.
-3. Account for additional factors used by the game when calculating drop rates.
-   - Artifact of Swarms lowers drop chances. (Lemurian w/ Swarms: 5%) vs (Lemurian w/o Swarms: 7.9%)
-   - Elites have higher drop rates than normal enemies. (Normal Lemurian: 7.9%) vs (Elite Lemurian: 19%)
-   - Some enemies have a higher base drop rate than others. (Normal Beetle: 5%) vs (Normal Scavenger: 43.2%)
-   - Some entities have a native drop rate of 0%. (Mending healing orbs, TheBackup drones, Void Infestors)
-4. Bad Luck Protection: A 4 player lobby will have a base drop rate of 1.25, so it is possible for drops to feel scarce. We prevent unlucky streaks by adding all drop chances to a pool, and increasing drop rates after it reaches 100%. Bad luck protection only kicks in if the survivor's item count is falling behind (fewer item drops than expected or low item drops per minute).
-   - Example: Survivors have killed 80 enemies with a drop rate of 1.25%, adding up to 100%.
-     - next enemy has a 1.25% drop rate, so the drop rate will be bumped to 2.5%. (cumulative chance = 101.25%)
-     - next enemy has a 3% drop rate, so the drop rate will be bumped to 7.25%. (cumulative chance = 104.25%)
-     - next enemy has a 1.25% drop rate, so the drop rate will be bumped to 6.75%. (cumulative chance = 105.5%)
-     - next enemy has a 5% drop rate, so the drop rate will be bumped to 10.5%. (cumulative chance = 110.5%)
-5. Do not scale teleporter loot drops by player count
-
-### Contributors
+## Contributors
 
 - [tgrieger](https://github.com/tgrieger)
 - Grey

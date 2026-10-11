@@ -1,14 +1,11 @@
 {
-    "name": "InstanceBasedLoot",
-    "version_number": "2.2.0",
-    "website_url": "https://github.com/programit/RoR2InstanceLootPlugin",
-    "description": "Adds balanced, instance-based loot when you're running with \"Artifact of Sacrifice\" and \"Artifact of Command\" enabled. Adds a shortcut F3 to pull all unpicked items to you",
+    "name": "Instance_Based_Loot_Fixed",
+    "version_number": "2.4.0",
+    "website_url": "https://github.com/nickgg11/RoR2InstanceLootPlugin",
+    "description": "Instance-based loot for Artifact of Sacrifice + Artifact of Command. Every player gets their own Command cubes from kills, chests, bosses and events, with balanced drop rates. Updated for RoR2 1.5. Rebindable hotkey (F3) pulls cubes to you.",
     "dependencies": [
-		"bbepis-BepInExPack-5.4.2117",
-		"RiskofThunder-HookGenPatcher-1.2.5",
-		"RiskofThunder-R2API_Items-1.0.4",
-		"RiskofThunder-R2API_Language-1.0.1",
-		"RiskofThunder-R2API_Networking-1.0.2",
-		"RiskofThunder-R2API_CommandHelper-1.0.2"
+        "bbepis-BepInExPack-5.4.2122",
+        "RiskofThunder-HookGenPatcher-1.2.9",
+        "RiskofThunder-R2API_Networking-1.0.4"
     ]
 }

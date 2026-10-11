@@ -25,24 +25,25 @@ public class DropRateManager
         MinimumDropChance = minimumDropChance;
     }
 
-    public float GetPlayerAwareBaseDropChance(int playerCount, float dropChance)
+    public float GetBaseDropChance(bool scaleByPlayerCount, int playerCount)
     {
-        float playerBasedDropRateMultiplier = 1f / playerCount;
-        float multiplier = playerBasedDropRateMultiplier * DropChanceMultiplier.Value;
-        float newDropChance = Math.Max(BaseDropChance.Value * multiplier, MinimumDropChance.Value);
-
-        if (!dropChance.Equals(newDropChance))
+        float dropChance = BaseDropChance.Value * DropChanceMultiplier.Value;
+        if (!scaleByPlayerCount)
         {
-            dropChance = newDropChance;
-            Log.Debug(
-                $"Using dropRate of {dropChance}% (base={BaseDropChance.Value}, multiplier={DropChanceMultiplier.Value}, playerCount={playerCount}, minimumDropChance={MinimumDropChance.Value}");
+            return dropChance;
         }
 
-        return dropChance;
+        // Guard against a 0 player count during scene transitions, which would make the drop chance infinite.
+        return Math.Max(dropChance / Math.Max(1, playerCount), MinimumDropChance.Value);
     }
 
     public float ComputeDropChance(bool isSwarmEnabled, float nativeDropChance, float nativeBaseDropChance, float dropChance)
     {
+        if (nativeBaseDropChance <= 0)
+        {
+            return nativeDropChance;
+        }
+
         // Approximately balance Swarms Artifact since they didn't do a good job of it.
         float swarmModifiedNativeChance = !(EnableSwarmsScaling.Value && isSwarmEnabled) || nativeDropChance == 0
             ? nativeDropChance
